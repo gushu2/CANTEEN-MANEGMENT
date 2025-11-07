@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getChefsSpecial } from '../services/geminiService';
 
 interface Special {
     name: string;
@@ -6,9 +7,50 @@ interface Special {
 }
 
 const ChefSpecial: React.FC = () => {
-    const special: Special = {
-        name: "Palak Paneer Delight",
-        description: "Creamy spinach curry with soft paneer cubes, spiced to perfection. A comforting and healthy choice."
+    const [special, setSpecial] = useState<Special | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchSpecial = async () => {
+            try {
+                const result = await getChefsSpecial();
+                setSpecial(result);
+            } catch (err) {
+                setError("Could not load today's special.");
+                console.error(err);
+            }
+        };
+
+        fetchSpecial();
+    }, []);
+
+    const content = () => {
+        if (!special && !error) {
+            return (
+                <div>
+                    <div className="h-6 bg-white/20 rounded w-3/4 animate-pulse mb-2"></div>
+                    <div className="h-4 bg-white/20 rounded w-full animate-pulse"></div>
+                    <div className="h-4 bg-white/20 rounded w-2/3 animate-pulse mt-1"></div>
+                </div>
+            );
+        }
+        if (error) {
+             return (
+                <div>
+                    <h3 className="text-2xl font-bold text-yellow-300">Could not load special</h3>
+                    <p className="mt-1 text-indigo-100">{error}</p>
+                </div>
+            );
+        }
+        if (special) {
+            return (
+                <div>
+                    <h3 className="text-2xl font-bold text-yellow-300">{special.name}</h3>
+                    <p className="mt-1 text-indigo-100">{special.description}</p>
+                </div>
+            );
+        }
+        return null;
     };
     
     return (
@@ -22,10 +64,7 @@ const ChefSpecial: React.FC = () => {
                     </svg>
                     <h2 className="text-xl font-bold">Chef's Special of the Day</h2>
                 </div>
-                <div>
-                    <h3 className="text-2xl font-bold text-yellow-300">{special.name}</h3>
-                    <p className="mt-1 text-indigo-100">{special.description}</p>
-                </div>
+                {content()}
             </div>
         </div>
     );

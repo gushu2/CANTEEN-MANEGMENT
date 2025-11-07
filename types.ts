@@ -13,7 +13,7 @@ export interface MealSelection {
   optedOut?: boolean;
 }
 
-export type View = 'customer' | 'admin';
+export type View = 'customer' | 'admin' | 'imageEditor';
 
 export interface User {
   name:string;

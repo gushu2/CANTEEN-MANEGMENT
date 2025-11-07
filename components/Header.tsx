@@ -22,27 +22,35 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, currentView, setView })
             <h1 className="text-2xl font-bold text-slate-800">Karmic Canteen</h1>
         </div>
         <div className="flex items-center space-x-4">
-            {user.isAdmin && (
-                <div className="hidden sm:flex items-center space-x-1 bg-slate-200 p-1 rounded-lg">
-                <button
-                    onClick={() => setView('customer')}
-                    className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${
-                    currentView === 'customer' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
-                    }`}
-                >
-                    Menu View
-                </button>
+            <div className="hidden sm:flex items-center space-x-1 bg-slate-200 p-1 rounded-lg">
+              <button
+                  onClick={() => setView('customer')}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${
+                  currentView === 'customer' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
+                  }`}
+              >
+                  Canteen
+              </button>
+               <button
+                  onClick={() => setView('imageEditor')}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${
+                  currentView === 'imageEditor' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
+                  }`}
+              >
+                  Image Studio
+              </button>
+              {user.isAdmin && (
                 <button
                     onClick={() => setView('admin')}
                     className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${
                     currentView === 'admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
                     }`}
                 >
-                    Admin Dashboard
+                    Admin
                 </button>
-                </div>
-            )}
-             <div className="relative">
+              )}
+            </div>
+            <div className="relative">
                 <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center space-x-3 hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
                   <img src={user.photoUrl} alt={user.name} className="w-9 h-9 rounded-full border-2 border-indigo-200" />
                   <div className="hidden sm:flex flex-col items-start">

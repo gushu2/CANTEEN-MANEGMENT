@@ -7,6 +7,8 @@ import AdminView from './components/AdminView';
 import ChefSpecial from './components/ChefSpecial';
 import Login from './components/Login';
 import NotificationPermissionBanner from './components/NotificationPermissionBanner';
+import ImageEditor from './components/ImageEditor';
+import MobileNotificationModal from './components/MobileNotificationModal';
 
 
 const initialMenuItems: FoodItem[] = [
@@ -171,6 +173,8 @@ const App: React.FC = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [menuItems, setMenuItems] = useState<FoodItem[]>(initialMenuItems);
   const [toast, setToast] = useState<{ message: string; type: 'success' } | null>(null);
+  const [showMobileNotification, setShowMobileNotification] = useState(false);
+  const [mobileNotificationMessage, setMobileNotificationMessage] = useState('');
   
   // Effect to generate dummy data for today and for history on initial load
   useEffect(() => {
@@ -345,6 +349,11 @@ const App: React.FC = () => {
     
     setToast({ message: "Selection confirmed! Your coupon is ready.", type: 'success' });
 
+    if (user.phoneNumber) {
+        setMobileNotificationMessage(confirmationMessage);
+        setShowMobileNotification(true);
+    }
+
   }, [user, currentSelection, isAfterCutoff, notificationPermission]);
 
   const handleOptOut = useCallback(() => {
@@ -373,6 +382,11 @@ const App: React.FC = () => {
       }
       
       setToast({ message: "You have opted out for tomorrow.", type: 'success' });
+
+      if (user.phoneNumber) {
+        setMobileNotificationMessage(optOutMessage);
+        setShowMobileNotification(true);
+      }
     }
   }, [user, isAfterCutoff, notificationPermission]);
 
@@ -413,7 +427,7 @@ const App: React.FC = () => {
         setView={setView} 
       />
       <main className="container mx-auto p-4 md:p-6 lg:p-8 animate-fade-in">
-        {(view === 'customer' || !user.isAdmin) ? (
+        {view === 'customer' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
                <NotificationPermissionBanner permissionStatus={notificationPermission} onEnable={handleRequestPermission} />
@@ -437,7 +451,11 @@ const App: React.FC = () => {
               />
             </div>
           </div>
-        ) : (
+        )}
+        {view === 'imageEditor' && (
+            <ImageEditor />
+        )}
+        {view === 'admin' && user.isAdmin && (
           <AdminView 
             selections={allSelections}
             historicalSelections={historicalSelections}
@@ -453,6 +471,13 @@ const App: React.FC = () => {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+      {showMobileNotification && user?.phoneNumber && (
+        <MobileNotificationModal
+          phoneNumber={user.phoneNumber}
+          message={mobileNotificationMessage}
+          onClose={() => setShowMobileNotification(false)}
         />
       )}
     </div>
