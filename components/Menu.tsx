@@ -1,5 +1,4 @@
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FoodItem } from '../types';
 import MenuItemCard from './MenuItemCard';
 
@@ -18,31 +17,44 @@ const Menu: React.FC<MenuProps> = ({ menuItems, onSelectItem, isAfterCutoff }) =
   }, [menuItems]);
 
   const categoryOrder: (keyof typeof groupedMenu)[] = ['Breakfast', 'Lunch', 'Evening Snack', 'Beverage'];
+  const [activeCategory, setActiveCategory] = useState<string>(categoryOrder[0]);
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">Tomorrow's Menu</h2>
-      <p className="text-gray-600 mb-6">
-        Please make your selection for tomorrow before the <span className="font-bold text-indigo-600">9:00 PM</span> deadline tonight. Selections are final.
-      </p>
+    <div className="bg-white p-6 rounded-xl shadow-md">
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6">
+        <div>
+          <h2 className="text-3xl font-bold text-slate-800">Tomorrow's Menu</h2>
+          <p className="text-slate-500 mt-1">
+            Deadline for selection is <span className="font-semibold text-indigo-600">9:00 PM</span> tonight.
+          </p>
+        </div>
+         <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg mt-4 md:mt-0">
+          {categoryOrder.map(category => (
+            groupedMenu[category] && (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-200 ${
+                  activeCategory === category ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                {category}
+              </button>
+            )
+          ))}
+        </div>
+      </div>
       
-      {categoryOrder.map(category => (
-        groupedMenu[category] && (
-          <div key={category} className="mb-8">
-            <h3 className="text-2xl font-semibold text-gray-700 mb-4 pb-2 border-b-2 border-indigo-200">{category}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {groupedMenu[category].map((item) => (
-                <MenuItemCard 
-                  key={item.id} 
-                  item={item} 
-                  onSelectItem={onSelectItem} 
-                  isAfterCutoff={isAfterCutoff}
-                />
-              ))}
-            </div>
-          </div>
-        )
-      ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {groupedMenu[activeCategory]?.map((item) => (
+            <MenuItemCard 
+              key={item.id} 
+              item={item} 
+              onSelectItem={onSelectItem} 
+              isAfterCutoff={isAfterCutoff}
+            />
+          ))}
+        </div>
     </div>
   );
 };

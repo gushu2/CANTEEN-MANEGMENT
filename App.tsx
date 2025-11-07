@@ -6,7 +6,7 @@ import MySelection from './components/MySelection';
 import AdminView from './components/AdminView';
 import ChefSpecial from './components/ChefSpecial';
 import Login from './components/Login';
-import SmsToast from './components/SmsToast';
+import NotificationPermissionBanner from './components/NotificationPermissionBanner';
 
 
 const initialMenuItems: FoodItem[] = [
@@ -116,6 +116,50 @@ const createDummySelections = (users: User[], menu: FoodItem[], date: Date): Mea
   return selections;
 };
 
+// --- Reusable Toast Notification Component ---
+interface ToastProps {
+  message: string;
+  type: 'success' | 'error';
+  onClose: () => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 5000); // Auto-dismiss after 5 seconds
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [onClose]);
+
+  const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
+  const icon = type === 'success' ? (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ) : (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+
+  return (
+    <div className="fixed bottom-5 right-5 z-[100] animate-toast-in">
+      <div className={`${bgColor} text-white font-semibold rounded-lg shadow-2xl flex items-center p-4`}>
+        <div className="mr-3">{icon}</div>
+        <p>{message}</p>
+        <button onClick={onClose} className="ml-4 text-white hover:bg-white/20 p-1 rounded-full transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [currentSelection, setCurrentSelection] = useState<FoodItem[]>([]);
@@ -126,17 +170,12 @@ const App: React.FC = () => {
   const [isAfterCutoff, setIsAfterCutoff] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [menuItems, setMenuItems] = useState<FoodItem[]>(initialMenuItems);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const showSmsToast = (phoneNumber: string, message: string) => {
-    const formattedMessage = `To: ${phoneNumber}\n\n${message}`;
-    setToast(formattedMessage);
-  };
-
+  const [toast, setToast] = useState<{ message: string; type: 'success' } | null>(null);
+  
   // Effect to generate dummy data for today and for history on initial load
   useEffect(() => {
     const today = new Date();
-    setAllSelections(createDummySelections(dummyUsers, initialMenuItems, today));
+    setAllSelections(createDummySelections(dummyUsers.slice(0, 10), initialMenuItems, today)); // Start with 10 selections
 
     // Generate historical data for the last 30 days
     const history: MealSelection[] = [];
@@ -148,6 +187,44 @@ const App: React.FC = () => {
     setHistoricalSelections(history);
   }, []);
 
+  // Effect to simulate real-time orders for the admin view
+  useEffect(() => {
+    if (!user?.isAdmin || view !== 'admin') return;
+
+    const intervalId = setInterval(() => {
+      setAllSelections(prevSelections => {
+        const usersWithSelections = new Set(prevSelections.map(s => s.user.email));
+        const usersWithoutSelections = dummyUsers.filter(u => !usersWithSelections.has(u.email));
+
+        if (usersWithoutSelections.length === 0) {
+          clearInterval(intervalId);
+          return prevSelections;
+        }
+
+        const randomUser = usersWithoutSelections[Math.floor(Math.random() * usersWithoutSelections.length)];
+        
+        if (Math.random() < 0.15) {
+            const optOutSelection: MealSelection = { user: randomUser, items: [], date: new Date(), optedOut: true };
+            return [...prevSelections, optOutSelection];
+        }
+
+        const mainCourse = menuItems.find(item => item.category === 'Lunch' && Math.random() > 0.4);
+        const snack = menuItems.find(item => item.category === 'Evening Snack' && Math.random() > 0.5);
+        const beverage = menuItems.find(item => item.category === 'Beverage' && Math.random() > 0.6);
+        const items = [mainCourse, snack, beverage].filter((item): item is FoodItem => !!item);
+
+        if (items.length > 0) {
+          const newSelection: MealSelection = { user: randomUser, items, date: new Date() };
+          return [...prevSelections, newSelection];
+        }
+        
+        return prevSelections;
+      });
+    }, 4000);
+
+    return () => clearInterval(intervalId);
+  }, [user?.isAdmin, view, menuItems]);
+
   useEffect(() => {
     const checkCutoff = () => {
       const now = new Date();
@@ -157,21 +234,14 @@ const App: React.FC = () => {
     };
 
     checkCutoff();
-    const intervalId = setInterval(checkCutoff, 60000); // Check every minute
+    const intervalId = setInterval(checkCutoff, 60000);
 
     return () => clearInterval(intervalId);
   }, []);
 
-  // Effect to request notification permission upon employee login
   useEffect(() => {
     if (user && !user.isAdmin) {
-      if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          setNotificationPermission(permission);
-        });
-      } else {
-        setNotificationPermission(Notification.permission);
-      }
+      setNotificationPermission(Notification.permission);
     }
   }, [user]);
 
@@ -179,27 +249,16 @@ const App: React.FC = () => {
   useEffect(() => {
     let reminderTimeout: number;
 
-    // Conditions for sending a reminder:
-    // 1. User is an employee
-    // 2. They have not confirmed their meal
-    // 3. It's before the cutoff time
-    // 4. Notification permission is granted
     if (user && !user.isAdmin && !userConfirmed && !isAfterCutoff && notificationPermission === 'granted') {
-      // For demo purposes, send a reminder 5 seconds after login.
-      // In a real application, this logic would be tied to a specific time (e.g., 8 PM).
       reminderTimeout = window.setTimeout(() => {
         const reminderMessage = "Just a friendly reminder to confirm your meal selection for tomorrow before the 9:00 PM deadline!";
         new Notification("Karmic Canteen Reminder", {
           body: reminderMessage,
           icon: '/vite.svg'
         });
-        if (user.phoneNumber) {
-            showSmsToast(user.phoneNumber, reminderMessage);
-        }
-      }, 5000);
+      }, 30000); // Reminder after 30 seconds
     }
 
-    // Cleanup: clear the timeout if the user confirms their selection or logs out
     return () => {
       if (reminderTimeout) {
         clearTimeout(reminderTimeout);
@@ -216,10 +275,9 @@ const App: React.FC = () => {
         isAdmin: true,
       });
     } else if (email && phoneNumber) {
-       // Create a user name from the email address
       const name = email.split('@')[0]
         .replace(/[._-]/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase()); // Capitalize words
+        .replace(/\b\w/g, l => l.toUpperCase());
         
       setUser({
         name,
@@ -240,15 +298,13 @@ const App: React.FC = () => {
   }, []);
 
   const handleSelectItem = useCallback((itemToAdd: FoodItem) => {
-    if (userConfirmed || isAfterCutoff) return; // Don't allow changes after confirmation or cutoff
+    if (userConfirmed || isAfterCutoff) return;
 
     setCurrentSelection((prev) => {
-      // If the new item is a main course, replace any existing main course
       if (itemToAdd.category === 'Lunch') {
         const otherItems = prev.filter(item => item.category !== 'Lunch');
         return [...otherItems, itemToAdd];
       }
-      // Otherwise, add if it's not already there
       if (!prev.find(item => item.id === itemToAdd.id)) {
         return [...prev, itemToAdd];
       }
@@ -259,6 +315,7 @@ const App: React.FC = () => {
   const handleDeselectItem = useCallback((itemId: number) => {
     if (userConfirmed || isAfterCutoff) return;
     setCurrentSelection((prev) => prev.filter(item => item.id !== itemId));
+    // FIX: Corrected typo from isafterCutoff to isAfterCutoff
   }, [userConfirmed, isAfterCutoff]);
 
 
@@ -271,28 +328,22 @@ const App: React.FC = () => {
       date: new Date(),
     };
     
-    // Replace previous selection for the same user
     setAllSelections((prev) => {
         const otherSelections = prev.filter(s => s.user.email !== user.email);
         return [...otherSelections, newSelection];
     });
     setUserConfirmed(true);
     
-    const confirmationMessage = "We've received your meal selection. You can still modify it before 9:00 PM.";
-    // Browser Notification
+    const confirmationMessage = "Your meal coupon is ready! You can view and download it from the 'My Plate' section.";
+
     if (notificationPermission === 'granted') {
       new Notification("Your Order is Confirmed!", {
         body: confirmationMessage,
         icon: '/vite.svg'
       });
-    } else {
-      alert('Your meal selection for tomorrow has been confirmed!');
     }
     
-    // SMS Notification
-    if(user.phoneNumber) {
-        showSmsToast(user.phoneNumber, confirmationMessage);
-    }
+    setToast({ message: "Selection confirmed! Your coupon is ready.", type: 'success' });
 
   }, [user, currentSelection, isAfterCutoff, notificationPermission]);
 
@@ -306,7 +357,6 @@ const App: React.FC = () => {
         date: new Date(),
         optedOut: true,
       };
-      // Replace previous selection for the same user
       setAllSelections((prev) => {
         const otherSelections = prev.filter(s => s.user.email !== user.email);
         return [...otherSelections, newSelection];
@@ -320,22 +370,22 @@ const App: React.FC = () => {
           body: optOutMessage,
           icon: '/vite.svg'
         });
-      } else {
-        alert("You have successfully opted out for tomorrow's meal.");
       }
       
-      // SMS Notification
-      if (user.phoneNumber) {
-        showSmsToast(user.phoneNumber, optOutMessage);
-      }
+      setToast({ message: "You have opted out for tomorrow.", type: 'success' });
     }
   }, [user, isAfterCutoff, notificationPermission]);
 
   const handleModifySelection = useCallback(() => {
     setUserConfirmed(false);
   }, []);
+  
+  const handleRequestPermission = useCallback(() => {
+    Notification.requestPermission().then(permission => {
+      setNotificationPermission(permission);
+    });
+  }, []);
 
-  // --- Menu Management Handlers ---
   const handleAddItem = (item: Omit<FoodItem, 'id' | 'price'>) => {
     setMenuItems(prev => [...prev, { ...item, id: Date.now(), price: 0 }]);
   };
@@ -355,7 +405,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
+    <div className="min-h-screen bg-slate-50">
       <Header 
         user={user} 
         onLogout={handleLogout}
@@ -366,6 +416,7 @@ const App: React.FC = () => {
         {(view === 'customer' || !user.isAdmin) ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
+               <NotificationPermissionBanner permissionStatus={notificationPermission} onEnable={handleRequestPermission} />
                <ChefSpecial />
                <Menu 
                   menuItems={menuItems} 
@@ -375,6 +426,7 @@ const App: React.FC = () => {
             </div>
             <div className="lg:col-span-1">
               <MySelection
+                user={user}
                 selection={currentSelection}
                 onConfirm={handleConfirmSelection}
                 onDeselect={handleDeselectItem}
@@ -396,7 +448,13 @@ const App: React.FC = () => {
           />
         )}
       </main>
-      {toast && <SmsToast message={toast} onClose={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };
