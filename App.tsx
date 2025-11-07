@@ -6,6 +6,7 @@ import MySelection from './components/MySelection';
 import AdminView from './components/AdminView';
 import ChefSpecial from './components/ChefSpecial';
 import Login from './components/Login';
+import SmsToast from './components/SmsToast';
 
 
 const initialMenuItems: FoodItem[] = [
@@ -86,6 +87,7 @@ const dummyUsers: User[] = Array.from({ length: 25 }, (_, i) => ({
   email: `employee${i+1}@example.com`,
   photoUrl: `https://i.pravatar.cc/150?u=employee${i+1}@example.com`,
   isAdmin: false,
+  phoneNumber: `555-555-${5500 + i}`,
 }));
 
 // Dummy data for selections to showcase the admin view
@@ -124,6 +126,12 @@ const App: React.FC = () => {
   const [isAfterCutoff, setIsAfterCutoff] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [menuItems, setMenuItems] = useState<FoodItem[]>(initialMenuItems);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showSmsToast = (phoneNumber: string, message: string) => {
+    const formattedMessage = `To: ${phoneNumber}\n\n${message}`;
+    setToast(formattedMessage);
+  };
 
   // Effect to generate dummy data for today and for history on initial load
   useEffect(() => {
@@ -180,10 +188,14 @@ const App: React.FC = () => {
       // For demo purposes, send a reminder 5 seconds after login.
       // In a real application, this logic would be tied to a specific time (e.g., 8 PM).
       reminderTimeout = window.setTimeout(() => {
+        const reminderMessage = "Just a friendly reminder to confirm your meal selection for tomorrow before the 9:00 PM deadline!";
         new Notification("Karmic Canteen Reminder", {
-          body: "Just a friendly reminder to confirm your meal selection for tomorrow before the 9:00 PM deadline!",
+          body: reminderMessage,
           icon: '/vite.svg'
         });
+        if (user.phoneNumber) {
+            showSmsToast(user.phoneNumber, reminderMessage);
+        }
       }, 5000);
     }
 
@@ -195,7 +207,7 @@ const App: React.FC = () => {
     };
   }, [user, userConfirmed, isAfterCutoff, notificationPermission]);
 
-  const handleLogin = useCallback((isAdmin: boolean, email?: string) => {
+  const handleLogin = useCallback((isAdmin: boolean, email?: string, phoneNumber?: string) => {
     if (isAdmin) {
       setUser({
         name: 'Canteen Admin',
@@ -203,7 +215,7 @@ const App: React.FC = () => {
         photoUrl: `https://i.pravatar.cc/150?u=admin@example.com`,
         isAdmin: true,
       });
-    } else if (email) {
+    } else if (email && phoneNumber) {
        // Create a user name from the email address
       const name = email.split('@')[0]
         .replace(/[._-]/g, ' ')
@@ -214,6 +226,7 @@ const App: React.FC = () => {
         email,
         photoUrl: `https://i.pravatar.cc/150?u=${email}`,
         isAdmin: false,
+        phoneNumber,
       });
     }
     setUserConfirmed(false);
@@ -265,14 +278,20 @@ const App: React.FC = () => {
     });
     setUserConfirmed(true);
     
+    const confirmationMessage = "We've received your meal selection. You can still modify it before 9:00 PM.";
     // Browser Notification
     if (notificationPermission === 'granted') {
       new Notification("Your Order is Confirmed!", {
-        body: "We've received your meal selection. You can still modify it before 9:00 PM.",
+        body: confirmationMessage,
         icon: '/vite.svg'
       });
     } else {
       alert('Your meal selection for tomorrow has been confirmed!');
+    }
+    
+    // SMS Notification
+    if(user.phoneNumber) {
+        showSmsToast(user.phoneNumber, confirmationMessage);
     }
 
   }, [user, currentSelection, isAfterCutoff, notificationPermission]);
@@ -295,13 +314,19 @@ const App: React.FC = () => {
       setUserConfirmed(true);
       setCurrentSelection([]);
 
+      const optOutMessage = "Your choice to opt out for tomorrow's meal has been saved.";
       if (notificationPermission === 'granted') {
         new Notification("You have opted out", {
-          body: "Your choice to opt out for tomorrow's meal has been saved.",
+          body: optOutMessage,
           icon: '/vite.svg'
         });
       } else {
         alert("You have successfully opted out for tomorrow's meal.");
+      }
+      
+      // SMS Notification
+      if (user.phoneNumber) {
+        showSmsToast(user.phoneNumber, optOutMessage);
       }
     }
   }, [user, isAfterCutoff, notificationPermission]);
@@ -371,6 +396,7 @@ const App: React.FC = () => {
           />
         )}
       </main>
+      {toast && <SmsToast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 };

@@ -20,4 +20,5 @@ export interface User {
   email: string;
   photoUrl: string;
   isAdmin: boolean;
+  phoneNumber?: string;
 }

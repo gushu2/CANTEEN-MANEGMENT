@@ -1,15 +1,34 @@
 import React, { useState } from 'react';
 
 interface LoginProps {
-  onLogin: (isAdmin: boolean, email?: string) => void;
+  onLogin: (isAdmin: boolean, email?: string, phoneNumber?: string) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState('john.doe@karmic.com');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [error, setError] = useState('');
 
   const handleEmployeeLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(false, email);
+    setError('');
+
+    if (!email || !phoneNumber) {
+      setError('Both email and phone number are required.');
+      return;
+    }
+
+    if (!email.toLowerCase().endsWith('@gmail.com')) {
+      setError('Please use your @gmail.com email to log in.');
+      return;
+    }
+    
+    if (!/^[0-9-]+$/.test(phoneNumber)) {
+        setError('Please enter a valid phone number.');
+        return;
+    }
+
+    onLogin(false, email, phoneNumber);
   };
 
   return (
@@ -25,9 +44,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       </div>
       <div className="max-w-sm w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
         <form onSubmit={handleEmployeeLogin} className="space-y-4">
+          <h2 className="text-xl font-bold text-center text-gray-700">Employee Login</h2>
+          {error && <p className="text-red-500 text-sm text-center bg-red-100 p-2 rounded-md">{error}</p>}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Employee Email
+              Google Email Address
             </label>
             <div className="mt-1">
               <input
@@ -38,16 +59,37 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="employee@gmail.com"
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
           </div>
-          <button
-            type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-          >
-            Sign in as Employee
-          </button>
+          <div>
+            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+              Mobile Number (for SMS)
+            </label>
+            <div className="mt-1">
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                autoComplete="tel"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="e.g., 555-123-4567"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
         </form>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
