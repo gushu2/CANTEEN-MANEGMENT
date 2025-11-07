@@ -5,11 +5,16 @@ interface MenuItemCardProps {
   item: FoodItem;
   onSelectItem: (item: FoodItem) => void;
   isAfterCutoff: boolean;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
-const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onSelectItem, isAfterCutoff }) => {
+const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onSelectItem, isAfterCutoff, style, className }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden group transition-all duration-300 hover:shadow-lg hover:border-indigo-300 hover:-translate-y-1 p-5 flex flex-col">
+    <div 
+      className={`bg-white rounded-xl border border-slate-200 overflow-hidden group transition-all duration-300 hover:shadow-lg hover:border-indigo-300 hover:-translate-y-1 p-5 flex flex-col ${className}`}
+      style={style}
+      >
       <div className="flex justify-between items-start mb-2">
         <h3 className="text-lg font-semibold text-slate-800">{item.name}</h3>
         <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${

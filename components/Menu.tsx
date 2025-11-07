@@ -20,7 +20,7 @@ const Menu: React.FC<MenuProps> = ({ menuItems, onSelectItem, isAfterCutoff }) =
   const [activeCategory, setActiveCategory] = useState<string>(categoryOrder[0]);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
+    <div className="bg-white p-6 rounded-xl shadow-md animate-slide-in-up" style={{ animationDelay: '200ms', opacity: 0 }}>
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-6">
         <div>
           <h2 className="text-3xl font-bold text-slate-800">Tomorrow's Menu</h2>
@@ -46,12 +46,14 @@ const Menu: React.FC<MenuProps> = ({ menuItems, onSelectItem, isAfterCutoff }) =
       </div>
       
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {groupedMenu[activeCategory]?.map((item) => (
+          {groupedMenu[activeCategory]?.map((item, index) => (
             <MenuItemCard 
               key={item.id} 
               item={item} 
               onSelectItem={onSelectItem} 
               isAfterCutoff={isAfterCutoff}
+              style={{ animationDelay: `${index * 100}ms`, opacity: 0 }}
+              className="animate-slide-in-up"
             />
           ))}
         </div>

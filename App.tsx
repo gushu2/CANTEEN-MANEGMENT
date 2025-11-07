@@ -405,14 +405,14 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Header 
         user={user} 
         onLogout={handleLogout}
         currentView={view} 
         setView={setView} 
       />
-      <main className="container mx-auto p-4 md:p-6 lg:p-8">
+      <main className="container mx-auto p-4 md:p-6 lg:p-8 animate-fade-in">
         {(view === 'customer' || !user.isAdmin) ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">

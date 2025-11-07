@@ -16,9 +16,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, currentView, setView })
       <div className="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
         <div className="flex items-center space-x-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 text-indigo-600" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-              <path d="M12.5 13.04l2.71-2.71c.2-.2.2-.51 0-.71s-.51-.2-.71 0L12 12.08l-2.5-2.5c-.2-.2-.51-.2-.71 0s-.2.51 0 .71l2.71 2.71-2.71 2.71c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L12 13.92l2.5 2.5c.1.1.23.15.35.15s.26-.05.35-.15c.2-.2.2-.51 0-.71L12.5 13.04z" opacity=".3"/>
-              <path d="M12.5 13.04l2.71-2.71c.2-.2.2-.51 0-.71s-.51-.2-.71 0L12 12.08l-2.5-2.5c-.2-.2-.51-.2-.71 0s-.2.51 0 .71l2.71 2.71-2.71 2.71c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L12 13.92l2.5 2.5c.1.1.23.15.35.15s.26-.05.35-.15c.2-.2.2-.51 0-.71L12.5 13.04z" />
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" opacity=".3"/>
+              <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .55-.02.81-.05.1-.01.19-.08.24-.17.1-.17.02-.38-.15-.48-1.57-.92-2.6-2.61-2.6-4.47 0-2.84 2.3-5.14 5.14-5.14.75 0 1.46.17 2.1.46.18.08.39 0 .48-.15.09-.15.08-.34-.02-.48C17.06 4.3 14.63 4 12 4z"/>
             </svg>
             <h1 className="text-2xl font-bold text-slate-800">Karmic Canteen</h1>
         </div>
@@ -55,8 +54,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, currentView, setView })
                     </svg>
                 </button>
 
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 border border-slate-200"
+                <div 
+                    className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 border border-slate-200 transition-all duration-300 origin-top-right ${isDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
                     onMouseLeave={() => setIsDropdownOpen(false)}>
                       <div className="p-2 border-b">
                           <p className="font-semibold text-sm text-slate-800">{user.name}</p>
@@ -72,7 +71,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, currentView, setView })
                           <span>Logout</span>
                       </button>
                   </div>
-                )}
             </div>
         </div>
       </div>

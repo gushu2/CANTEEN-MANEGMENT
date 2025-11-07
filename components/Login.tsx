@@ -5,9 +5,12 @@ interface LoginProps {
 }
 
 // FIX: Replaced JSX.Element with React.ReactElement to resolve namespace issue.
-const InfoCard: React.FC<{title: string, color: string, icon: React.ReactElement, children: React.ReactNode}> = ({title, color, icon, children}) => {
+const InfoCard: React.FC<{title: string, color: string, icon: React.ReactElement, children: React.ReactNode, delay: number}> = ({title, color, icon, children, delay}) => {
     return (
-        <div className={`w-full text-left p-6 bg-${color}-50 border border-${color}-200 rounded-lg`}>
+        <div 
+          className={`w-full text-left p-6 bg-${color}-50 border border-${color}-200 rounded-lg animate-slide-in-up`}
+          style={{ animationDelay: `${delay}ms`, opacity: 0}}
+          >
             <div className="flex items-center">
                 <div className={`text-${color}-600`}>{icon}</div>
                 <h2 className={`ml-2 text-lg font-bold text-${color}-800`}>{title}</h2>
@@ -48,34 +51,33 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen flex flex-col justify-center items-center p-4">
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         
         <div className="hidden md:flex flex-col space-y-6">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 animate-slide-in-up" style={{ animationDelay: '100ms', opacity: 0}}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-indigo-600" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                  <path d="M12.5 13.04l2.71-2.71c.2-.2.2-.51 0-.71s-.51-.2-.71 0L12 12.08l-2.5-2.5c-.2-.2-.51-.2-.71 0s-.2.51 0 .71l2.71 2.71-2.71 2.71c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L12 13.92l2.5 2.5c.1.1.23.15.35.15s.26-.05.35-.15c.2-.2.2-.51 0-.71L12.5 13.04z" opacity=".3"/>
-                  <path d="M12.5 13.04l2.71-2.71c.2-.2.2-.51 0-.71s-.51-.2-.71 0L12 12.08l-2.5-2.5c-.2-.2-.51-.2-.71 0s-.2.51 0 .71l2.71 2.71-2.71 2.71c-.2.2-.2.51 0 .71.1.1.23.15.35.15s.26-.05.35-.15L12 13.92l2.5 2.5c.1.1.23.15.35.15s.26-.05.35-.15c.2-.2.2-.51 0-.71L12.5 13.04z" />
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" opacity=".3"/>
+                    <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .55-.02.81-.05.1-.01.19-.08.24-.17.1-.17.02-.38-.15-.48-1.57-.92-2.6-2.61-2.6-4.47 0-2.84 2.3-5.14 5.14-5.14.75 0 1.46.17 2.1.46.18.08.39 0 .48-.15.09-.15.08-.34-.02-.48C17.06 4.3 14.63 4 12 4z"/>
                 </svg>
                 <div>
                   <h1 className="text-3xl font-bold text-slate-800">Karmic Canteen</h1>
                   <p className="text-slate-500">Your smart and simple canteen solution.</p>
                 </div>
             </div>
-            <InfoCard title="The Challenge" color="amber" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
+            <InfoCard title="The Challenge" color="amber" delay={300} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                  <p>
                     Karmic Solutions faces food wastage and operational inefficiency due to a manual process for tracking employee meal preferences. This leads to inaccurate estimations, increased costs, and limited dietary insights.
                 </p>
             </InfoCard>
-             <InfoCard title="The Solution" color="emerald" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
+             <InfoCard title="The Solution" color="emerald" delay={500} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}>
                  <p>
                     The Karmic Canteen App automates meal selection and data consolidation, ensuring food is prepared based on precise, confirmed demand, reducing waste and providing valuable insights.
                 </p>
             </InfoCard>
         </div>
 
-        <div className="w-full bg-white rounded-xl shadow-lg p-8 space-y-6 border border-slate-200">
+        <div className="w-full bg-white rounded-xl shadow-lg p-8 space-y-6 border border-slate-200 animate-slide-in-up" style={{ animationDelay: '200ms', opacity: 0}}>
             <div className="md:hidden text-center mb-4">
                 <h1 className="text-3xl font-bold text-slate-800">Karmic Canteen</h1>
                 <p className="text-slate-500">Welcome! Please sign in.</p>
@@ -97,7 +99,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@gmail.com"
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
                 </div>
             </div>
@@ -115,14 +117,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="e.g., 555-123-4567"
-                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
                 </div>
             </div>
             <div>
                 <button
                 type="submit"
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-105"
                 >
                 Sign In
                 </button>
@@ -144,9 +146,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </button>
         </div>
         </div>
-      <p className="mt-8 text-center text-sm text-slate-500">
-        Built with Gemini AI
-      </p>
     </div>
   );
 };

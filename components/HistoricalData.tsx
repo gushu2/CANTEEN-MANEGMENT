@@ -80,15 +80,15 @@ const HistoricalData: React.FC<HistoricalDataProps> = ({ selections }) => {
       <div>
         <h4 className="text-xl font-semibold text-slate-700 mb-4">Item Popularity Trends</h4>
         <div className="space-y-4">
-          {sortedItems.map(item => (
-            <div key={item.name}>
+          {sortedItems.map((item, index) => (
+            <div key={item.name} className="animate-slide-in-up" style={{ animationDelay: `${index * 50}ms`, opacity: 0 }}>
                 <div className="flex justify-between items-center mb-1">
                     <div className="text-sm font-medium text-slate-700 truncate pr-2">{item.name}</div>
                     <div className="text-sm font-bold text-slate-600">{item.count}</div>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-2.5">
                     <div 
-                    className="bg-indigo-500 h-2.5 rounded-full"
+                    className="bg-indigo-500 h-2.5 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: maxCount > 0 ? `${(item.count / maxCount) * 100}%` : '0%' }}
                     >
                     </div>

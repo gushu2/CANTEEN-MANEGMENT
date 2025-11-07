@@ -14,7 +14,7 @@ interface MySelectionProps {
 
 const MySelectionItem: React.FC<{item: FoodItem; onDeselect: (itemId: number) => void; isActionsDisabled: boolean}> = ({ item, onDeselect, isActionsDisabled }) => {
     return (
-        <div className="flex items-center justify-between py-3">
+        <div className="flex items-center justify-between py-3 animate-fade-in">
             <div>
                 <p className="font-semibold text-slate-800">{item.name}</p>
                 <p className="text-sm text-slate-500">{item.category}</p>
@@ -63,7 +63,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
   const renderContent = () => {
     if (isAfterCutoff && !isConfirmed) {
         return (
-            <div className="text-center py-8 flex flex-col items-center">
+            <div className="text-center py-8 flex flex-col items-center animate-fade-in">
                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -78,7 +78,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
 
         if (hasOptedOut) {
             return (
-              <div className="text-center py-6 flex flex-col items-center">
+              <div className="text-center py-6 flex flex-col items-center animate-fade-in">
                   <div className="flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red-100">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
                   </div>
@@ -106,7 +106,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(qrData)}&format=png`;
         
         return (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center animate-fade-in">
                 <div className="bg-emerald-100 p-4 rounded-lg w-full text-center">
                     <h3 className="font-bold text-emerald-800 text-lg">Your Meal Coupon is Ready!</h3>
                     <p className="text-sm text-emerald-700 mt-1">Show this QR code at the canteen counter.</p>
@@ -133,7 +133,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
                 
                 <button
                     onClick={handleDownload}
-                    className="mt-6 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-colors duration-200 flex items-center justify-center space-x-2"
+                    className="mt-6 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -155,7 +155,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
 
     if (selection.length === 0) {
       return (
-        <div className="text-center py-8 flex flex-col items-center">
+        <div className="text-center py-8 flex flex-col items-center animate-fade-in">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
@@ -172,7 +172,7 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
     }
 
     return (
-        <>
+        <div className="animate-fade-in">
             <div className="divide-y divide-slate-200">
                 {selection.map((item) => (
                     <MySelectionItem key={item.id} item={item} onDeselect={onDeselect} isActionsDisabled={isConfirmed || isAfterCutoff} />
@@ -181,19 +181,19 @@ const MySelection: React.FC<MySelectionProps> = ({ user, selection, isConfirmed,
             <div className="mt-6 border-t border-slate-200 pt-4">
                 <button
                     onClick={onConfirm}
-                    className="w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-colors duration-200"
+                    className="w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all transform hover:scale-105"
                 >
                     Confirm My Selection
                 </button>
             </div>
-        </>
+        </div>
     );
   };
 
 
   return (
     <aside className="sticky top-24">
-        <div className="bg-white rounded-xl shadow-md border border-slate-200">
+        <div className="bg-white rounded-xl shadow-md border border-slate-200 animate-slide-in-up" style={{ animationDelay: '300ms', opacity: 0 }}>
             <h2 className="text-xl font-bold text-slate-800 border-b border-slate-200 p-4">My Plate for Tomorrow</h2>
             <div className="p-4">
                 {renderContent()}
